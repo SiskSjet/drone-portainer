@@ -15,8 +15,6 @@ steps:
       from_secret: ghcr_username
     password: 
       from_secret: ghcr_password
-    repo: ghcr.io/sisksjet/stardust
-    platforms:
-      - linux/arm64
-      - linux/amd64
+    repo: ghcr.io/${DRONE_REPO,,}
+    platform: linux/arm64
     auto_tag: true

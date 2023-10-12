@@ -1,9 +1,11 @@
 import fs from 'fs';
+import https from 'https';
 import Axios from 'axios';
 
 const portainerUrl      = process.env.PLUGIN_PORTAINER_URL;
 const portainerUsername = process.env.PLUGIN_PORTAINER_USERNAME;
 const portainerPassword = process.env.PLUGIN_PORTAINER_PASSWORD;
+const ignoreSelfSigned  = process.env.PLUGIN_IGNORE_SELF_SIGNED;
 const registry          = process.env.PLUGIN_REGISTRY;
 const image             = process.env.PLUGIN_IMAGE;
 const imageTag          = process.env.PLUGIN_IMAGE_TAG;
@@ -24,14 +26,22 @@ if (!dockerComposeFile || dockerComposeFile === '') {
     dockerComposeFile = "docker-compose.yml";
 }
 
+let rejectUnauthorized = true;
+if (ignoreSelfSigned !== '') {
+    rejectUnauthorized = !(ignoreSelfSigned?.toLowerCase?.() === 'true');
+}
+
 const imageName = `${registry}/${image}`;
 
 const axios = Axios.create({
     baseURL: `${portainerUrl}/api`,
+    httpsAgent: new https.Agent({rejectUnauthorized: rejectUnauthorized}),
     validateStatus: function(status) {
         return status < 5000;
     }
 });
+
+  
 
 (async function() {
 
